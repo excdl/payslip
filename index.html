@@ -8,6 +8,7 @@
 body{font-family:"微軟正黑體";background:#f4f6f9;margin:0;}
 .container{max-width:520px;margin:auto;padding:20px;}
 .title{text-align:center;font-size:38px;font-weight:bold;margin-bottom:10px;}
+.greeting{text-align:center;font-size:22px;margin-bottom:10px;}
 .search-box{display:flex;justify-content:center;align-items:center;gap:10px;margin:20px 0;}
 input, button{padding:14px;font-size:18px;border-radius:6px;height:50px;box-sizing:border-box;}
 input[type="password"]{width:70%;border:1px solid #ccc;}
@@ -22,6 +23,7 @@ button:hover{background:#27ae60;}
 .subtotal{font-weight:bold;background:#fafafa;}
 .final-total{margin-top:20px;font-size:30px;font-weight:bold;text-align:right;color:#e74c3c;}
 .note{margin-top:20px;font-size:16px;color:#555;}
+.date-display{text-align:center;font-size:18px;margin-bottom:15px;color:#555;}
 @media print {body * {visibility:hidden;} #salary-card, #salary-card * {visibility:visible;} #salary-card {position:absolute; left:0; top:0;width:100%;margin:0;padding:25px;}}
 </style>
 </head>
@@ -29,6 +31,8 @@ button:hover{background:#27ae60;}
 
 <div class="container">
 <div class="title">員工薪資查詢</div>
+<div id="greeting" class="greeting"></div>
+<div id="date-display" class="date-display"></div>
 
 <!-- 代碼輸入 -->
 <div class="search-box" id="code-box" style="display:none;">
@@ -43,6 +47,12 @@ button:hover{background:#27ae60;}
 <script>
 var url="https://script.google.com/macros/s/AKfycbyVgp9ovRVX5hRWCLkIY_AJVqPsIrzpNzCcpkIKPt8kMjTUSmpdxjpH4YUCP5vo3jpK/exec"; // 替換成你的 GAS 網址
 var lineId="";
+var lineName="";
+
+// 日期格式
+function formatDate(d){
+    return d.getFullYear()+"-"+(d.getMonth()+1).toString().padStart(2,'0')+"-"+d.getDate().toString().padStart(2,'0');
+}
 
 // 初始化 LIFF
 liff.init({liffId: "2009495087-qHY8LDuV"})
@@ -51,12 +61,20 @@ liff.init({liffId: "2009495087-qHY8LDuV"})
     return liff.getProfile();
 })
 .then(profile=>{
-    lineId=profile.userId;
-    // 對 GAS 做 LINE ID 驗證
+    lineId = profile.userId;
+    lineName = profile.displayName;
+    document.getElementById("greeting").innerText = lineName + " 您好:"; // 顯示用戶名問候
+    document.getElementById("date-display").innerText = "查詢日期: " + formatDate(new Date());
+
+    // LINE ID 驗證
     fetch(url+"?lineid="+encodeURIComponent(lineId))
     .then(res=>res.json())
     .then(data=>{
-        if(data.length<=1){alert("LINE ID 未註冊"); return;}
+        if(data.length<=1){
+            alert("LINE ID 未註冊，無法使用薪資查詢");
+            return; // 不顯示代碼框
+        }
+        // 驗證成功，顯示代碼輸入框
         document.getElementById("code-box").style.display="flex";
     })
     .catch(err=>{console.error(err); alert("LINE ID 驗證失敗");});
@@ -135,6 +153,7 @@ function querySalary(){
 
 </body>
 </html>
+
 
 
 
