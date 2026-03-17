@@ -2,236 +2,124 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>薪資查詢系統</title>
-
+<title>員工薪資查詢 - 密碼版</title>
 <style>
-
-body{
-font-family:"微軟正黑體";
-background:#f4f6f9;
-margin:0;
-}
-
-.container{
-max-width:900px;
-margin:auto;
-padding:20px;
-}
-
-.title{
-text-align:center;
-font-size:32px;
-font-weight:bold;
-color:#2c3e50;
-}
-
-.search-box{
-text-align:center;
-margin:20px 0;
-}
-
-input{
-padding:12px;
-font-size:18px;
-width:260px;
-border-radius:6px;
-border:1px solid #ccc;
-}
-
-button{
-padding:12px 20px;
-font-size:16px;
-border:none;
-border-radius:6px;
-background:#2ecc71;
-color:white;
-cursor:pointer;
-}
-
-button:hover{
-background:#27ae60;
-}
-
-.salary-card{
-background:white;
-border-radius:10px;
-padding:20px;
-margin-top:20px;
-box-shadow:0 4px 10px rgba(0,0,0,0.1);
-}
-
-.salary-title{
-font-size:22px;
-font-weight:bold;
-text-align:center;
-margin-bottom:10px;
-}
-
-.row{
-display:flex;
-justify-content:space-between;
-margin:6px 0;
-}
-
-.section{
-margin-top:15px;
-font-weight:bold;
-color:#34495e;
-}
-
-.total{
-font-size:22px;
-color:#e74c3c;
-font-weight:bold;
-}
-
+body{font-family:"微軟正黑體";background:#f4f6f9;margin:0;}
+.container{max-width:520px;margin:auto;padding:20px;}
+.title{text-align:center;font-size:38px;font-weight:bold;margin-bottom:10px;}
+.search-box{text-align:center;margin:20px 0;}
+input{padding:14px;font-size:22px;width:260px;border-radius:6px;border:1px solid #ccc;}
+input[type="password"]{letter-spacing:0.3em;} /* 顯示密碼點距 */
+button{padding:12px 20px;font-size:18px;border:none;border-radius:6px;background:#2ecc71;color:white;cursor:pointer;}
+button:hover{background:#27ae60;}
+.salary-card{background:white;border-radius:12px;padding:25px;margin-top:20px;box-shadow:0 4px 10px rgba(0,0,0,0.15);}
+.salary-title{font-size:30px;text-align:center;font-weight:bold;margin-bottom:15px;}
+.info{font-size:20px;line-height:1.8;margin-bottom:15px;}
+.salary-table{width:100%;border-collapse:collapse;font-size:22px;}
+.salary-table td{border:1px solid #ddd;padding:10px;}
+.table-head{background:#f2f2f2;font-weight:bold;text-align:center;}
+.subtotal{font-weight:bold;background:#fafafa;}
+.final-total{margin-top:20px;font-size:30px;font-weight:bold;text-align:right;color:#e74c3c;}
+.note{margin-top:20px;font-size:16px;color:#555;}
 @media screen and (max-width:600px){
-
-.row{
-flex-direction:column;
+.salary-table td{font-size:18px;padding:8px;}
+.final-total{font-size:26px;}
 }
-
-}
-
 </style>
-
 </head>
-
 <body>
 
 <div class="container">
-
-<div class="title">員工薪資查詢</div>
+<div class="title">員工薪資查詢 - 密碼版</div>
 
 <div class="search-box">
-
-<input type="text" id="uid" placeholder="請輸入身分證字號">
-
-<button onclick="query()">查詢</button>
-
+<input type="password" id="uid" placeholder="請輸入您的代碼">
+<button onclick="query()">查詢薪資</button>
 <button onclick="window.print()">下載PDF</button>
-
 </div>
 
 <div id="result"></div>
-
 </div>
 
 <script>
-
-var url="https://script.google.com/macros/s/AKfycbzWo4V3xA9ksqdLevPMpaQfX6iSuoUyGpzsAN6zYq7cP8d3QbOIyoloajNTmKL5izpc/exec";
+var url="https://script.google.com/macros/s/AKfycbx9muAUVJU8N6g1eHhXgMU258qePAvPjPkt6T2rLQjmySJbqBbribtmyby8I3zC0zz6/exec"; // 替換成你的 GAS 網址
 
 function query(){
+let uid=document.getElementById("uid").value.trim();
+if(uid==""){alert("請輸入代碼"); return;}
 
-let uid=document.getElementById("uid").value;
-
-fetch(url+"?uid="+uid)
-
+fetch(url+"?uid="+encodeURIComponent(uid))
 .then(res=>res.json())
-
 .then(data=>{
-
 let container=document.getElementById("result");
-
 container.innerHTML="";
-
-if(data.length<=1){
-
-container.innerHTML="<h3 style='color:red;text-align:center;'>查無資料</h3>";
-
-return;
-
-}
+if(data.length<=1){container.innerHTML="<h3 style='color:red;text-align:center'>查無資料</h3>"; return;}
 
 let header=data[0].data;
 let row=data[1].data;
 
-function get(name){
+function get(name){let idx=header.indexOf(name); return idx>-1 ? row[idx] : "";}
+function show(value){return !(value=="" || value=="0" || value=="0.00");}
+function formatNum(value){ if(value=="" || value=="0") return ""; return Number(value).toLocaleString(); }
+function rowHTML(name,value){ if(!show(value)) return ""; return `<tr><td>${name}</td><td>${formatNum(value)}</td></tr>`;}
 
-let index=header.indexOf(name);
+// 加項
+let addHTML="";
+addHTML+=rowHTML("本薪",get("本薪"));
+addHTML+=rowHTML("加班費",get("加班費"));
+addHTML+=rowHTML("全勤獎金",get("全勤獎金"));
+addHTML+=rowHTML("交通津貼",get("交通津貼"));
+addHTML+=rowHTML("伙食津貼",get("伙食津貼"));
+addHTML+=rowHTML("其他加項",get("其他加項"));
 
-return index>-1 ? row[index] : "";
-
-}
+// 減項
+let minusHTML="";
+minusHTML+=rowHTML("勞保自負額",get("勞保自負額"));
+minusHTML+=rowHTML("健保自負額",get("健保自負額"));
+minusHTML+=rowHTML("事假扣款",get("事假扣款"));
+minusHTML+=rowHTML("病假扣款",get("病假扣款"));
+minusHTML+=rowHTML("遲到/早退扣款",get("遲到/早退扣款"));
+minusHTML+=rowHTML("曠職扣款",get("曠職扣款"));
+minusHTML+=rowHTML("借支",get("借支"));
+minusHTML+=rowHTML("未打卡扣款",get("未打卡扣款"));
 
 container.innerHTML=`
-
 <div class="salary-card">
-
 <div class="salary-title">薪資明細表</div>
 
-<div class="row">
-<div>姓名</div>
-<div>${get("員工姓名")}</div>
+<div class="info">
+姓名：${get("員工姓名")}<br>
+工作類型：${get("工作類型")}<br>
+計薪月份：${get("薪資結算月份")}<br>
+結算日：${get("結算日")}
 </div>
 
-<div class="row">
-<div>工作類型</div>
-<div>${get("工作類型")}</div>
+<table class="salary-table">
+<tr class="table-head"><td>薪資加項</td><td>金額</td></tr>
+${addHTML}
+<tr class="subtotal"><td>加項總計 (+)</td><td>${formatNum(get("加項合計(A)"))}</td></tr>
+</table>
+
+<table class="salary-table" style="margin-top:10px;">
+<tr class="table-head"><td>薪資減項</td><td>金額</td></tr>
+${minusHTML}
+<tr class="subtotal"><td>減項總計 (-)</td><td>${formatNum(get("減項合計(B)"))}</td></tr>
+</table>
+
+<div class="final-total">
+實領薪資：${formatNum(get("實領"))}
 </div>
 
-<div class="row">
-<div>計薪月份</div>
-<div>${get("薪資結算月份")}</div>
-</div>
-
-<div class="section">薪資加項</div>
-
-<div class="row">
-<div>本薪</div>
-<div>${get("本薪")}</div>
-</div>
-
-<div class="row">
-<div>加班費</div>
-<div>${get("加班費")}</div>
-</div>
-
-<div class="row">
-<div>全勤獎金</div>
-<div>${get("全勤獎金")}</div>
-</div>
-
-<div class="row">
-<div>交通津貼</div>
-<div>${get("交通津貼")}</div>
-</div>
-
-<div class="row">
-<div>伙食津貼</div>
-<div>${get("伙食津貼")}</div>
-</div>
-
-<div class="section">薪資減項</div>
-
-<div class="row">
-<div>勞保</div>
-<div>${get("勞保自負額")}</div>
-</div>
-
-<div class="row">
-<div>健保</div>
-<div>${get("健保自負額")}</div>
-</div>
-
-<div class="row">
-<div>借支</div>
-<div>${get("借支")}</div>
-</div>
-
-<div class="row total">
-<div>實領薪資</div>
-<div>${get("實領")}</div>
+<div class="note">
+備註事項<br>
+1. 每月10號為薪資發放日<br>
+2. 薪資如有問題請聯繫人資
 </div>
 
 </div>
-
 `;
-
 });
-
 }
-
 </script>
 
 </body>
