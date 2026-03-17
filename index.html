@@ -7,6 +7,8 @@
 body{font-family:"微軟正黑體";background:#f4f6f9;margin:0;}
 .container{max-width:520px;margin:auto;padding:20px;}
 .title{text-align:center;font-size:38px;font-weight:bold;margin-bottom:10px;}
+
+/* 查詢區 */
 .search-box{
     display:flex;
     justify-content:center;
@@ -20,20 +22,25 @@ input[type="password"]{
     font-size:22px;
     border-radius:6px;
     border:1px solid #ccc;
-    width:70%; /* 原來的 70% 寬度，減少30% */
+    width:70%;
     letter-spacing:0.3em;
+    height:50px;  /* 固定高度與按鈕一致 */
+    box-sizing:border-box;
 }
 button{
-    padding:12px 20px;
+    padding:0 20px;
     font-size:18px;
     border:none;
     border-radius:6px;
     background:#2ecc71;
     color:white;
     cursor:pointer;
+    height:50px; /* 與輸入框同高 */
+    white-space:nowrap; /* 文字不換行 */
 }
 button:hover{background:#27ae60;}
 
+/* 薪資卡片 */
 .salary-card{
     background:white;
     border-radius:12px;
@@ -51,13 +58,14 @@ button:hover{background:#27ae60;}
 .subtotal{font-weight:bold;background:#fafafa;}
 .final-total{margin-top:20px;font-size:30px;font-weight:bold;text-align:right;color:#e74c3c;}
 .note{margin-top:20px;font-size:16px;color:#555;}
+
 @media screen and (max-width:600px){
     input[type="password"]{width:60%;}
     .salary-table td{font-size:18px;padding:8px;}
     .final-total{font-size:26px;}
 }
 
-/* PDF 列印設定 - 只印薪資卡片，完整寬度 */
+/* PDF 列印設定 */
 @media print {
     body * {visibility:hidden;}
     #salary-card, #salary-card * {visibility:visible;}
@@ -75,7 +83,7 @@ button:hover{background:#27ae60;}
 <body>
 
 <div class="container">
-<div class="title">員工薪資查詢 - 密碼版</div>
+<div class="title">員工薪資查詢</div>
 
 <div class="search-box">
 <input type="password" id="uid" placeholder="請輸入代碼">
@@ -175,6 +183,5 @@ function query(){
 
 </body>
 </html>
-
 
 
