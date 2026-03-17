@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>員工薪資查詢系統</title>
+
+<style>
+
+body{
+font-family:"微軟正黑體";
+background:#f3f3f3;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+background:white;
+padding:30px;
+border-radius:10px;
+box-shadow:0 4px 15px rgba(0,0,0,0.2);
+}
+
+h1{
+text-align:center;
+}
+
+input{
+padding:10px;
+font-size:16px;
+margin:5px;
+}
+
+button{
+padding:10px 20px;
+cursor:pointer;
+}
+
+.salary{
+border:1px solid #ddd;
+margin-top:20px;
+padding:20px;
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+margin:5px 0;
+}
+
+.total{
+font-size:22px;
+color:red;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>薪資查詢系統</h1>
+
+<div style="text-align:center">
+
+<input id="emp" placeholder="員工編號">
+
+<input id="id4" type="password" placeholder="身分證後4碼">
+
+<button onclick="login()">查詢</button>
+
+</div>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+
+let url="https://script.google.com/macros/s/AKfycbzcr0vvet7oysBVvZu3vjeVYx-HrjrYyKHErpNKMdZOxg53bZ548bwu2spAxuq_tNul/exec";
+
+function login(){
+
+let emp=document.getElementById("emp").value;
+
+let id4=document.getElementById("id4").value;
+
+fetch(url+"?emp="+emp+"&id4="+id4)
+
+.then(res=>res.json())
+
+.then(data=>{
+
+let box=document.getElementById("result");
+
+box.innerHTML="";
+
+if(data.length<=1){
+
+box.innerHTML="<h3 style='color:red'>登入失敗</h3>";
+
+return;
+
+}
+
+let header=data[0].data;
+
+for(let i=1;i<data.length;i++){
+
+let row=data[i].data;
+
+function get(name){
+
+let index=header.indexOf(name);
+
+return row[index];
+
+}
+
+box.innerHTML+=`
+
+<div class="salary">
+
+<h2>${get("薪資結算月份")} 薪資單</h2>
+
+<div class="row">
+<div>姓名</div>
+<div>${get("員工姓名")}</div>
+</div>
+
+<div class="row">
+<div>工作類型</div>
+<div>${get("工作類型")}</div>
+</div>
+
+<div class="row">
+<div>本薪</div>
+<div>${get("本薪")}</div>
+</div>
+
+<div class="row">
+<div>加班費</div>
+<div>${get("加班費")}</div>
+</div>
+
+<div class="row">
+<div>全勤</div>
+<div>${get("全勤獎金")}</div>
+</div>
+
+<div class="row">
+<div>交通津貼</div>
+<div>${get("交通津貼")}</div>
+</div>
+
+<div class="row">
+<div>伙食津貼</div>
+<div>${get("伙食津貼")}</div>
+</div>
+
+<hr>
+
+<div class="row">
+<div>勞保</div>
+<div>${get("勞保自負額")}</div>
+</div>
+
+<div class="row">
+<div>健保</div>
+<div>${get("健保自負額")}</div>
+</div>
+
+<div class="row total">
+<div>實領</div>
+<div>${get("實領")}</div>
+</div>
+
+<button onclick="window.print()">下載PDF</button>
+
+</div>
+
+`;
+
+}
+
+})
+
+}
+
+</script>
+
+</body>
+</html>
