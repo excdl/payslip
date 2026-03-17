@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>齊樂家</title>
+<title>員工薪資查詢</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
 body{font-family:"微軟正黑體";background:#f4f6f9;margin:0;}
@@ -24,15 +24,10 @@ button:hover{background:#27ae60;}
 .final-total{margin-top:20px;font-size:30px;font-weight:bold;text-align:right;color:#e74c3c;}
 .note{margin-top:20px;font-size:16px;color:#555;}
 .date-display{text-align:center;font-size:18px;margin-bottom:15px;color:#555;}
-/* 列印設定 */
 @media print {
   body * {visibility:hidden;}
   #salary-card, #salary-card * {visibility:visible;}
-  #salary-card {
-    position:absolute; left:0; top:0;
-    width:100%; margin:0; padding:25px;
-    box-sizing:border-box; font-size:22px;
-  }
+  #salary-card {position:absolute; left:0; top:0;width:100%; margin:0; padding:25px; box-sizing:border-box; font-size:22px;}
   table.salary-table td{word-break:break-word;}
 }
 </style>
@@ -54,7 +49,7 @@ button:hover{background:#27ae60;}
 </div>
 
 <script>
-var url="https://script.google.com/macros/s/AKfycbxlS02lVCxc4QZ71x64xTgKBkZ6QG7ZJXnvXKpX-bz4Y5GBqt_gurfzcLbKbzOkEKnr/exec"; // 替換成你的 GAS 網址
+var url="https://script.google.com/macros/s/AKfycbzCGnlurATtmipIZBZepRwWzQeRTKOV5DqEdA4IjWHHGY-MT4fuQAZqUC729tLsYVD5/exec"; // 替換成你的 GAS 網址
 var lineId="";
 var lineName="";
 
@@ -74,16 +69,14 @@ liff.init({liffId: "2009495087-qHY8LDuV"})
     document.getElementById("greeting").innerText = lineName + " 您好:";
     document.getElementById("date-display").innerText = "查詢日期: " + formatDate(new Date());
 
-    // 先檢查 LINE ID 是否有對應薪資條
+    // 檢查 LINE ID 是否有薪資資料
     fetch(url+"?uid=&lineid="+encodeURIComponent(lineId))
     .then(res=>res.json())
     .then(data=>{
         if(data.length > 1){
-            // 有找到資料，顯示代碼輸入框
             document.getElementById("code-box").style.display="flex";
         } else {
-            // 沒找到資料，不顯示代碼輸入框，顯示訊息
-            document.getElementById("result").innerHTML="<h3 style='color:red;text-align:center'>查無薪資資料</h3>";
+            document.getElementById("result").innerHTML="<h3 style='color:red;text-align:center'>尚未建立薪資資料，請聯繫人資</h3>";
         }
     })
     .catch(err=>console.error(err));
