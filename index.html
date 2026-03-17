@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -73,7 +73,20 @@ liff.init({liffId: "2009495087-qHY8LDuV"})
     lineName = profile.displayName;
     document.getElementById("greeting").innerText = lineName + " 您好:";
     document.getElementById("date-display").innerText = "查詢日期: " + formatDate(new Date());
-    document.getElementById("code-box").style.display="flex";
+
+    // 先檢查 LINE ID 是否有對應薪資條
+    fetch(url+"?uid=&lineid="+encodeURIComponent(lineId))
+    .then(res=>res.json())
+    .then(data=>{
+        if(data.length > 1){
+            // 有找到資料，顯示代碼輸入框
+            document.getElementById("code-box").style.display="flex";
+        } else {
+            // 沒找到資料，不顯示代碼輸入框，顯示訊息
+            document.getElementById("result").innerHTML="<h3 style='color:red;text-align:center'>查無薪資資料</h3>";
+        }
+    })
+    .catch(err=>console.error(err));
 })
 .catch(err=>console.error(err));
 
