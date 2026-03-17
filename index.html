@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>員工薪資查詢 - 雙層認證</title>
+<title>員工薪資查詢</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
 body{font-family:"微軟正黑體";background:#f4f6f9;margin:0;}
@@ -18,13 +18,23 @@ button:hover{background:#27ae60;}
 .salary-title{font-size:30px;text-align:center;font-weight:bold;margin-bottom:15px;}
 .info{font-size:20px;line-height:1.8;margin-bottom:15px;}
 .salary-table{width:100%;border-collapse:collapse;font-size:22px;}
-.salary-table td{border:1px solid #ddd;padding:10px;}
+.salary-table td{border:1px solid #ddd;padding:10px;word-break:break-word;}
 .table-head{background:#f2f2f2;font-weight:bold;text-align:center;}
 .subtotal{font-weight:bold;background:#fafafa;}
 .final-total{margin-top:20px;font-size:30px;font-weight:bold;text-align:right;color:#e74c3c;}
 .note{margin-top:20px;font-size:16px;color:#555;}
 .date-display{text-align:center;font-size:18px;margin-bottom:15px;color:#555;}
-@media print {body * {visibility:hidden;} #salary-card, #salary-card * {visibility:visible;} #salary-card {position:absolute; left:0; top:0;width:100%;margin:0;padding:25px;}}
+/* 列印設定 */
+@media print {
+  body * {visibility:hidden;}
+  #salary-card, #salary-card * {visibility:visible;}
+  #salary-card {
+    position:absolute; left:0; top:0;
+    width:100%; margin:0; padding:25px;
+    box-sizing:border-box; font-size:22px;
+  }
+  table.salary-table td{word-break:break-word;}
+}
 </style>
 </head>
 <body>
@@ -34,7 +44,6 @@ button:hover{background:#27ae60;}
 <div id="greeting" class="greeting"></div>
 <div id="date-display" class="date-display"></div>
 
-<!-- 代碼輸入 -->
 <div class="search-box" id="code-box" style="display:none;">
 <input type="password" id="uid" placeholder="請輸入代碼">
 <button onclick="querySalary()">查詢薪資</button>
@@ -49,7 +58,6 @@ var url="https://script.google.com/macros/s/AKfycbxlS02lVCxc4QZ71x64xTgKBkZ6QG7Z
 var lineId="";
 var lineName="";
 
-// 日期格式
 function formatDate(d){
     return d.getFullYear()+"-"+(d.getMonth()+1).toString().padStart(2,'0')+"-"+d.getDate().toString().padStart(2,'0');
 }
@@ -65,8 +73,6 @@ liff.init({liffId: "2009495087-qHY8LDuV"})
     lineName = profile.displayName;
     document.getElementById("greeting").innerText = lineName + " 您好:";
     document.getElementById("date-display").innerText = "查詢日期: " + formatDate(new Date());
-
-    // LINE ID 驗證成功 → 顯示代碼輸入框
     document.getElementById("code-box").style.display="flex";
 })
 .catch(err=>console.error(err));
@@ -139,5 +145,3 @@ function querySalary(){
 
 </body>
 </html>
-
-
