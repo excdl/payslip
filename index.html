@@ -7,12 +7,42 @@
 body{font-family:"微軟正黑體";background:#f4f6f9;margin:0;}
 .container{max-width:520px;margin:auto;padding:20px;}
 .title{text-align:center;font-size:38px;font-weight:bold;margin-bottom:10px;}
-.search-box{text-align:center;margin:20px 0;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
-input{padding:14px;font-size:22px;border-radius:6px;border:1px solid #ccc;}
-input[type="password"]{letter-spacing:0.3em;flex:1 1 180px;}
-button{padding:12px 20px;font-size:18px;border:none;border-radius:6px;background:#2ecc71;color:white;cursor:pointer;}
+.search-box{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    flex-wrap:nowrap; /* 不換行 */
+    margin:20px 0;
+}
+input[type="password"]{
+    padding:14px;
+    font-size:22px;
+    border-radius:6px;
+    border:1px solid #ccc;
+    width:70%; /* 原來的 70% 寬度，減少30% */
+    letter-spacing:0.3em;
+}
+button{
+    padding:12px 20px;
+    font-size:18px;
+    border:none;
+    border-radius:6px;
+    background:#2ecc71;
+    color:white;
+    cursor:pointer;
+}
 button:hover{background:#27ae60;}
-.salary-card{background:white;border-radius:12px;padding:25px;margin-top:20px;box-shadow:0 4px 10px rgba(0,0,0,0.15);}
+
+.salary-card{
+    background:white;
+    border-radius:12px;
+    padding:25px;
+    margin-top:20px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.15);
+    width:100%;
+    box-sizing:border-box;
+}
 .salary-title{font-size:30px;text-align:center;font-weight:bold;margin-bottom:15px;}
 .info{font-size:20px;line-height:1.8;margin-bottom:15px;}
 .salary-table{width:100%;border-collapse:collapse;font-size:22px;}
@@ -22,13 +52,23 @@ button:hover{background:#27ae60;}
 .final-total{margin-top:20px;font-size:30px;font-weight:bold;text-align:right;color:#e74c3c;}
 .note{margin-top:20px;font-size:16px;color:#555;}
 @media screen and (max-width:600px){
-.salary-table td{font-size:18px;padding:8px;}
-.final-total{font-size:26px;}
+    input[type="password"]{width:60%;}
+    .salary-table td{font-size:18px;padding:8px;}
+    .final-total{font-size:26px;}
 }
+
+/* PDF 列印設定 - 只印薪資卡片，完整寬度 */
 @media print {
-  body * {visibility:hidden;}
-  #salary-card, #salary-card * {visibility:visible;}
-  #salary-card {position:absolute;left:0;top:0;width:100%;}
+    body * {visibility:hidden;}
+    #salary-card, #salary-card * {visibility:visible;}
+    #salary-card {
+        position:absolute;
+        left:0;
+        top:0;
+        width:100%;
+        margin:0;
+        padding:25px;
+    }
 }
 </style>
 </head>
@@ -135,3 +175,6 @@ function query(){
 
 </body>
 </html>
+
+
+
