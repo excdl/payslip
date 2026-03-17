@@ -45,7 +45,7 @@ button:hover{background:#27ae60;}
 </div>
 
 <script>
-var url="https://script.google.com/macros/s/AKfycbyVgp9ovRVX5hRWCLkIY_AJVqPsIrzpNzCcpkIKPt8kMjTUSmpdxjpH4YUCP5vo3jpK/exec"; // 替換成你的 GAS 網址
+var url="https://script.google.com/macros/s/AKfycbyxRH0hlqUzuNg9_czfDSznbMRHeANolr1QttFxwagTzk641lj-i2Mg7zjHP9G3aIT9/exec"; // 替換成你的 GAS 網址
 var lineId="";
 var lineName="";
 
@@ -63,7 +63,7 @@ liff.init({liffId: "2009495087-qHY8LDuV"})
 .then(profile=>{
     lineId = profile.userId;
     lineName = profile.displayName;
-    document.getElementById("greeting").innerText = lineName + " 您好:"; // 顯示用戶名問候
+    document.getElementById("greeting").innerText = lineName + " 您好:"; // 用戶名問候
     document.getElementById("date-display").innerText = "查詢日期: " + formatDate(new Date());
 
     // LINE ID 驗證
@@ -74,8 +74,7 @@ liff.init({liffId: "2009495087-qHY8LDuV"})
             alert("LINE ID 未註冊，無法使用薪資查詢");
             return; // 不顯示代碼框
         }
-        // 驗證成功，顯示代碼輸入框
-        document.getElementById("code-box").style.display="flex";
+        document.getElementById("code-box").style.display="flex"; // 驗證成功
     })
     .catch(err=>{console.error(err); alert("LINE ID 驗證失敗");});
 })
