@@ -121,12 +121,12 @@ function querySalary(){
             結算日：${get(["結算日"])}
           </div>
           <table class="salary-table">
-            <tr class="table-head"><td>應給項目</td><td>金額</td></tr>
+            <tr class="table-head"><td>項目明細(+)</td><td>金額</td></tr>
             ${addHTML}
             <tr class="subtotal"><td>加項總額</td><td>${formatNum(get(["加項總額"]))}</td></tr>
           </table>
           <table class="salary-table" style="margin-top:10px;">
-            <tr class="table-head"><td>應扣項目</td><td>金額</td></tr>
+            <tr class="table-head"><td>項目明細(-)</td><td>金額</td></tr>
             ${minusHTML}
             <tr class="subtotal"><td>減項總額</td><td>${formatNum(get(["減項總額"]))}</td></tr>
           </table>
