@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <title>員工薪資查詢</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<!-- 引入 html2pdf.js 套件，用來將 HTML 畫面轉成 PDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 body{font-family:"微軟正黑體";background:#f4f6f9;margin:0;}
 .container{max-width:520px;margin:auto;padding:20px;}
@@ -38,8 +36,6 @@ button:hover{background:#27ae60;}
 <div class="search-box" id="code-box" style="display:none;">
 <input type="password" id="uid" placeholder="請輸入代碼">
 <button onclick="querySalary()">查詢薪資</button>
-<!-- 修改這裡：改呼叫 downloadPDF() 函式 -->
-<button onclick="downloadPDF()" style="background:#3498db;">下載PDF</button>
 </div>
 
 <div id="result"></div>
@@ -49,7 +45,6 @@ button:hover{background:#27ae60;}
 var url="https://script.google.com/macros/s/AKfycbzCGnlurATtmipIZBZepRwWzQeRTKOV5DqEdA4IjWHHGY-MT4fuQAZqUC729tLsYVD5/exec"; 
 var lineId="";
 var lineName="";
-var currentMonth=""; // 用來記錄薪資月份當作檔名
 
 function formatDate(d){
     return d.getFullYear()+"-"+(d.getMonth()+1).toString().padStart(2,'0')+"-"+d.getDate().toString().padStart(2,'0');
@@ -98,15 +93,13 @@ function querySalary(){
         function formatNum(value){if(value=="" || value=="0") return ""; return Number(value).toLocaleString();}
         function rowHTML(name,value){if(!show(value)) return ""; return `<tr><td>${name}</td><td>${formatNum(value)}</td></tr>`;}
 
-        currentMonth = get(["薪資結算月份"]); // 記錄月份
-
         let addHTML="";
         addHTML+=rowHTML("本薪",get(["本薪","當月薪資"]));
         addHTML+=rowHTML("加班費",get(["加班費"]));
         addHTML+=rowHTML("全勤獎金",get(["全勤獎金"]));
         addHTML+=rowHTML("交通津貼",get(["交通津貼"]));
         addHTML+=rowHTML("伙食津貼",get(["伙食津貼"]));
-        addHTML+=rowHTML("其他加項",get(["其他加項"]));
+        addHTML+=rowHTML("其他加項",get(["攻擊加項","其他加項"]));
 
         let minusHTML="";
         minusHTML+=rowHTML("勞保自負額",get(["勞保自負額"]));
@@ -124,7 +117,7 @@ function querySalary(){
           <div class="info">
             姓名：${get(["員工姓名"])}<br>
             工作類型：${get(["工作類型"])}<br>
-            計薪月份：${currentMonth}<br>
+            計薪月份：${get(["薪資結算月份"])}<br>
             結算日：${get(["結算日"])}
           </div>
           <table class="salary-table">
@@ -145,51 +138,6 @@ function querySalary(){
           </div>
         </div>`;
     });
-}
-
-// 新增：處理 LINE LIFF 內下載 PDF 的專用函式
-function downloadPDF() {
-    const element = document.getElementById('salary-card');
-    if (!element) {
-        alert('請先查詢薪資，再點選下載！');
-        return;
-    }
-
-    // 設定 PDF 產生的參數
-    const opt = {
-        margin:       10,
-        filename:     (currentMonth || '員工') + '_薪資明細表.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    // 產生 PDF 的 Blob 檔案
-    html2pdf().set(opt).from(element).toPdf().output('blob').then(function(blob) {
-        // 將 Blob 轉換為 URL
-        const blobUrl = URL.createObjectURL(blob);
-        
-        // 關鍵核心：使用 LIFF 的 openWindow 呼叫外部瀏覽器打開此 PDF，跳脫 LINE 的下載限制
-        if (liff.isApiAvailable('openWindow')) {
-            liff.openWindow({
-                url: blobUrl,
-                external: true // 強制在手機內建瀏覽器（Safari/Chrome）打開，即可顺利下載儲存
-            });
-        } else {
-            // 備用方案（普通網頁環境）
-            const link = document.createElement('a');
-            link.href = blobUrl;
-            link.download = opt.filename;
-            link.click();
-        }
-    }).catch(err => {
-        alert('PDF 產生失敗：' + err);
-    });
-}
-</script>
-
-</body>
-</html>
 }
 </script>
 
