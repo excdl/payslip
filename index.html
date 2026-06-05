@@ -131,14 +131,14 @@ function querySalary(){
           <table class="salary-table">
             <tr class="table-head"><td>薪資加項</td><td>金額</td></tr>
             ${addHTML}
-            <tr class="subtotal"><td>加項總計 (+)</td><td>${formatNum(get(["加項合計(A)"]))}</td></tr>
+            <tr class="subtotal"><td>加項總額</td><td>${formatNum(get(["加項總額"]))}</td></tr>
           </table>
           <table class="salary-table" style="margin-top:10px;">
             <tr class="table-head"><td>薪資減項</td><td>金額</td></tr>
             ${minusHTML}
-            <tr class="subtotal"><td>減項總計 (-)</td><td>${formatNum(get(["減項合計(B)"]))}</td></tr>
+            <tr class="subtotal"><td>減項總額 (-)</td><td>${formatNum(get(["減項總額"]))}</td></tr>
           </table>
-          <div class="final-total">實領薪資：${formatNum(get(["實領"]))}</div>
+          <div class="final-total">實發金額：${formatNum(get(["實發金額"]))}</div>
           <div class="note">
             備註事項<br>
             1. 每月10號為薪資發放日<br>
