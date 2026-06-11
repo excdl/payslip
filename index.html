@@ -94,22 +94,24 @@ function querySalary(){
         function rowHTML(name,value){if(!show(value)) return ""; return `<tr><td>${name}</td><td>${formatNum(value)}</td></tr>`;}
 
         let addHTML="";
-        addHTML+=rowHTML("本薪",get(["本薪","當月薪資"]));
-        addHTML+=rowHTML("加班費",get(["加班費"]));
-        addHTML+=rowHTML("全勤獎金",get(["全勤獎金"]));
-        addHTML+=rowHTML("交通津貼",get(["交通津貼"]));
-        addHTML+=rowHTML("伙食津貼",get(["伙食津貼"]));
-        addHTML+=rowHTML("其他加項",get(["攻擊加項","其他加項"]));
+        addHTML+=rowHTML("基本薪資",get(["基本薪資"]));
+        addHTML+=rowHTML("加項薪資",get(["加項薪資"]));
+        addHTML+=rowHTML("加項薪資說明",get(["加項薪資說明"]));
+        addHTML+=rowHTML("其他加項",get(["其他加項"]));
+        addHTML+=rowHTML("其他加項說明",get(["其他加項說明"]));
+        addHTML+=rowHTML("新增加項",get([新增加項]));
+        addHTML+=rowHTML("加項說明",get([加項說明]));
+        addHTML+=rowHTML("加項說明",get([加項說明]));
 
         let minusHTML="";
-        minusHTML+=rowHTML("勞保自負額",get(["勞保自負額"]));
-        minusHTML+=rowHTML("健保自負額",get(["健保自負額"]));
+        minusHTML+=rowHTML("勞保費",get(["勞保費"]));
+        minusHTML+=rowHTML("健保費",get(["健保費"]));
         minusHTML+=rowHTML("事假扣款",get(["事假扣款"]));
         minusHTML+=rowHTML("病假扣款",get(["病假扣款"]));
-        minusHTML+=rowHTML("遲到/早退扣款",get(["遲到/早退扣款"]));
-        minusHTML+=rowHTML("曠職扣款",get(["曠職扣款"]));
-        minusHTML+=rowHTML("借支",get(["借支"]));
-        minusHTML+=rowHTML("未打卡扣款",get(["未打卡扣款"]));
+        minusHTML+=rowHTML("其他減項",get(["其他減項"]));
+        minusHTML+=rowHTML("其他減項說明",get(["其他減項說明"]));
+        minusHTML+=rowHTML("新增減項",get(["新增減項"]));
+        minusHTML+=rowHTML("減項說明",get(["減項說明"]));
 
         container.innerHTML=`
         <div id="salary-card" class="salary-card">
@@ -117,7 +119,7 @@ function querySalary(){
           <div class="info">
             姓名：${get(["員工姓名"])}<br>
             計薪月份：${get(["薪資結算月份"])}
-            
+            應發金額：${get(["應發金額"])}
           </div>
           <table class="salary-table">
             <tr class="table-head"><td>項目(+)</td><td>金額</td></tr>
