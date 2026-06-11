@@ -88,30 +88,67 @@ function querySalary(){
         let header=data[0].data;
         let row=data[1].data;
 
-        function get(nameList){for(let name of nameList){let idx=header.indexOf(name);if(idx>-1) return row[idx];} return "";}
-        function show(value){return !(value=="" || value=="0" || value=="0.00");}
-        function formatNum(value){if(value=="" || value=="0") return ""; return Number(value).toLocaleString();}
-        function rowHTML(name,value){if(!show(value)) return ""; return `<tr><td>${name}</td><td>${formatNum(value)}</td></tr>`;}
+        function get(nameList){
+  for(let name of nameList){
+    let idx=header.indexOf(name);
+    if(idx>-1) return row[idx];
+  }
+  return "";
+}
+
+function show(value){
+  return !(value=="" || value=="0" || value=="0.00");
+}
+
+function formatNum(value){
+  if(value=="" || value=="0") return "";
+  return Number(value).toLocaleString();
+}
+
+// 金額欄
+function moneyRow(name,value){
+  if(!show(value)) return "";
+  return `<tr><td>${name}</td><td>${formatNum(value)}</td></tr>`;
+}
+
+// 說明欄
+function textRow(name,value){
+
+  if(!value || value.trim()=="") return "";
+
+  let html = value
+    .split(/\r?\n/)
+    .filter(x => x.trim() !== "")
+    .map(x => `• ${x}`)
+    .join("<br>");
+
+  return `
+    <tr>
+      <td>${name}</td>
+      <td style="text-align:left;line-height:1.8;">
+        ${html}
+      </td>
+    </tr>`;
+}
 
         let addHTML="";
-        addHTML+=rowHTML("基本薪資",get(["基本薪資"]));
-        addHTML+=rowHTML("加項薪資",get(["加項薪資"]));
-        addHTML+=rowHTML("加項薪資說明",get(["加項薪資說明"]));
-        addHTML+=rowHTML("其他加項",get(["其他加項"]));
-        addHTML+=rowHTML("其他加項說明",get(["其他加項說明"]));
-        addHTML+=rowHTML("新增加項",get(["新增加項"]));
-        addHTML+=rowHTML("加項說明",get(["加項說明"]));
-        addHTML+=rowHTML("加項說明",get(["加項說明"]));
 
+        addHTML += moneyRow("基本薪資",get(["基本薪資"]));
+        addHTML += moneyRow("加項薪資",get(["加項薪資"]));
+        addHTML += textRow("加項薪資說明",get(["加項薪資說明"]));
+        addHTML += moneyRow("其他加項",get(["其他加項"]));
+        addHTML += textRow("其他加項說明",get(["其他加項說明"]));
+        addHTML += moneyRow("新增加項",get(["新增加項"]));
+        addHTML += textRow("加項說明",get(["加項說明"]));
         let minusHTML="";
-        minusHTML+=rowHTML("勞保費",get(["勞保費"]));
-        minusHTML+=rowHTML("健保費",get(["健保費"]));
-        minusHTML+=rowHTML("事假扣款",get(["事假扣款"]));
-        minusHTML+=rowHTML("病假扣款",get(["病假扣款"]));
-        minusHTML+=rowHTML("其他減項",get(["其他減項"]));
-        minusHTML+=rowHTML("其他減項說明",get(["其他減項說明"]));
-        minusHTML+=rowHTML("新增減項",get(["新增減項"]));
-        minusHTML+=rowHTML("減項說明",get(["減項說明"]));
+        minusHTML+=moneyRow("勞保費",get(["勞保費"]));
+        minusHTML+=moneyRow("健保費",get(["健保費"]));
+        minusHTML+=moneyRow("事假扣款",get(["事假扣款"]));
+        minusHTML+=moneyRow("病假扣款",get(["病假扣款"]));
+        minusHTML+=moneyRow("其他減項",get(["其他減項"]));
+       addHTML += textRow("其他減項說明",get(["其他減項說明"]));
+        minusHTML+=moneyRow("新增減項",get(["新增減項"]));
+        addHTML += textRow("減項說明",get(["減項說明"]));
 
         container.innerHTML=`
         <div id="salary-card" class="salary-card">
