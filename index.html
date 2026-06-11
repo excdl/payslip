@@ -108,7 +108,7 @@ function formatNum(value){
 // 金額欄
 function moneyRow(name,value){
   if(!show(value)) return "";
-  return `<tr><td>${name}</td><td>${formatNum(value)}</td></tr>`;
+  return `<tr><td>${name}</td><td>${formatMoney(value)}</td></tr>`;
 }
 
 // 說明欄
@@ -130,7 +130,14 @@ function textRow(name,value){
       </td>
     </tr>`;
 }
+function formatMoney(value){
+  if(value === "" || value === null || value === undefined) return "";
 
+  let num = Number(String(value).replace(/,/g, ""));
+  if (isNaN(num)) return value;
+
+  return "$" + num.toLocaleString("zh-TW");
+}
         let addHTML="";
 
         addHTML += moneyRow("加項薪資",get(["加項薪資"]));
@@ -155,19 +162,21 @@ function textRow(name,value){
           <div class="info">
             姓名：${get(["員工姓名"])}<br>
             計薪月份：${get(["薪資結算月份"])}<br>
-            應發薪資：${get(["應發薪資"])}
+            應發薪資：${formatMoney(get(["應發薪資"]))}
           </div>
           <table class="salary-table">
             <tr class="table-head"><td>項目(+)</td><td>金額</td></tr>
             ${addHTML}
-            <tr class="subtotal"><td>加項總額</td><td>${formatNum(get(["加項總額"]))}</td></tr>
+            <tr class="subtotal">
+          <td>加項總額</td><td>${formatMoney(get(["加項總額"]))}</td></tr>
           </table>
           <table class="salary-table" style="margin-top:10px;">
             <tr class="table-head"><td>項目(-)</td><td>金額</td></tr>
             ${minusHTML}
-            <tr class="subtotal"><td>減項總額</td><td>${formatNum(get(["減項總額"]))}</td></tr>
+            <tr class="subtotal">
+           <td>減項總額</td><td>${formatMoney(get(["減項總額"]))}</td></tr>
           </table>
-          <div class="final-total">實發金額：${formatNum(get(["實發金額"]))}</div>
+          <div class="final-total">實發金額：${formatMoney(get(["實發金額"]))}</div>
           <div class="note">
             備註事項<br>
             1. 每月7號為薪資發放日<br>
