@@ -247,89 +247,169 @@ liff.init({liffId: "2009495087-qHY8LDuV"})
 })
 .catch(err=>console.error(err));
 
-/* 查詢 */
+// 查詢薪資
 function querySalary(){
 
     let uid=document.getElementById("uid").value.trim();
+
     if(!uid){
         alert("請輸入代碼");
         return;
     }
 
     let btn=document.getElementById("queryBtn");
-    let loading=document.getElementById("loading");
 
     btn.disabled=true;
-    loading.style.display="flex";
-    document.getElementById("loadingText").innerText="登入中...";
+    btn.innerText="登入中...";
 
     fetch(url+"?uid="+encodeURIComponent(uid)+"&lineid="+encodeURIComponent(lineId))
     .then(res=>res.json())
     .then(data=>{
 
         btn.disabled=false;
-        loading.style.display="none";
+        btn.innerText="查詢薪資";
+
+        let container=document.getElementById("result");
+        container.innerHTML="";
 
         if(data.length<=1){
-            document.getElementById("result").innerHTML="<h3 style='color:red;text-align:center'>查無資料</h3>";
+            container.innerHTML="<h3 style='color:red;text-align:center'>查無資料</h3>";
             return;
         }
 
-        document.getElementById("code-box").style.display="none";
-        document.querySelector(".title").style.display="none";
-        document.getElementById("greeting").style.display="none";
-        document.getElementById("date-display").style.display="none";
-
+        // 登入成功隱藏登入畫面
+     document.getElementById("code-box").style.display="none";
+     document.querySelector(".title").style.display="none";
+     document.getElementById("greeting").style.display="none";
+     document.getElementById("date-display").style.display="none";
+        
         let header=data[0].data;
         let row=data[1].data;
 
-        function get(list){
-            for(let n of list){
-                let i=header.indexOf(n);
-                if(i>-1) return row[i];
+        function get(nameList){
+            for(let name of nameList){
+                let idx=header.indexOf(name);
+                if(idx>-1) return row[idx];
             }
             return "";
         }
 
-        function money(v){
-            if(!v) return "";
-            let n=Number(String(v).replace(/,/g,""));
-            return isNaN(n)?v:"$"+n.toLocaleString();
+        function show(value){
+            return !(value=="" || value=="0" || value=="0.00");
         }
 
-        let html=`
-        <div class="salary-card">
-            <div class="salary-title">💰 薪資明細表</div>
+        function formatMoney(value){
+            if(value === "" || value === null || value === undefined) return "";
+
+            let num = Number(String(value).replace(/,/g, ""));
+            if (isNaN(num)) return value;
+
+            return "$" + num.toLocaleString("zh-TW");
+        }
+
+        function moneyRow(name,value){
+            if(!show(value)) return "";
+            return `<tr><td>${name}</td><td>${formatMoney(value)}</td></tr>`;
+        }
+
+        function textRow(name,value){
+
+            if(!value || value.trim()=="") return "";
+
+            let html=value
+                .split(/\r?\n/)
+                .filter(x=>x.trim()!=="")
+                .map(x=>`• ${x}`)
+                .join("<br>");
+
+            return `
+            <tr>
+                <td>${name}</td>
+                <td style="text-align:left;line-height:1.8;">
+                    ${html}
+                </td>
+            </tr>`;
+        }
+
+        let addHTML="";
+        addHTML += moneyRow("加項薪資",get(["加項薪資"]));
+        addHTML += textRow("加項薪資說明",get(["加項薪資說明"]));
+        addHTML += moneyRow("其他加項",get(["其他加項"]));
+        addHTML += textRow("其他加項說明",get(["其他加項說明"]));
+        addHTML += moneyRow("新增加項",get(["新增加項"]));
+        addHTML += textRow("加項說明",get(["加項說明"]));
+
+        let minusHTML="";
+        minusHTML += moneyRow("勞保費",get(["勞保費"]));
+        minusHTML += moneyRow("健保費",get(["健保費"]));
+        minusHTML += moneyRow("事假扣款",get(["事假扣款"]));
+        minusHTML += moneyRow("病假扣款",get(["病假扣款"]));
+        minusHTML += moneyRow("其他減項",get(["其他減項"]));
+        addHTML += textRow("其他減項說明",get(["其他減項說明"]));
+        minusHTML += moneyRow("新增減項",get(["新增減項"]));
+        addHTML += textRow("減項說明",get(["減項說明"]));
+
+        container.innerHTML=`
+        <div id="salary-card" class="salary-card">
+            <div class="salary-title">薪資明細表</div>
 
             <div class="info">
                 姓名：${get(["員工姓名"])}<br>
-                月份：${get(["薪資結算月份"])}<br>
-                應發：${money(get(["應發薪資"]))}
+                計薪月份：${get(["薪資結算月份"])}<br>
+                應發薪資：${formatMoney(get(["應發薪資"]))}
             </div>
 
+            <table class="salary-table">
+                <tr class="table-head">
+                    <td>項目(+)</td>
+                    <td>金額</td>
+                </tr>
+                ${addHTML}
+                <tr class="subtotal">
+                    <td>加項總額</td>
+                    <td>${formatMoney(get(["加項總額"]))}</td>
+                </tr>
+            </table>
+
+            <table class="salary-table" style="margin-top:10px;">
+                <tr class="table-head">
+                    <td>項目(-)</td>
+                    <td>金額</td>
+                </tr>
+                ${minusHTML}
+                <tr class="subtotal">
+                    <td>減項總額</td>
+                    <td>${formatMoney(get(["減項總額"]))}</td>
+                </tr>
+            </table>
+
             <div class="final-total">
-                實發：${money(get(["實發金額"]))}
+                實發金額：${formatMoney(get(["實發金額"]))}
             </div>
 
             <div class="note">
-                1. 每月7號發薪<br>
-                2. 請洽人資
+                備註事項<br>
+                1. 每月7號為薪資發放日<br>
+                2. 薪資如有問題請聯繫人資
             </div>
         </div>`;
-
-        document.getElementById("result").innerHTML=html;
-
-        window.scrollTo({top:0,behavior:"smooth"});
+        window.scrollTo({
+    top:0,
+    behavior:"smooth"
+});
     })
     .catch(err=>{
+
         console.error(err);
-        loading.style.display="none";
+
         btn.disabled=false;
-        alert("系統錯誤");
+        btn.innerText="查詢薪資";
+
+        alert("系統連線失敗，請稍後再試");
     });
 }
-
 </script>
 
 </body>
 </html>
+
