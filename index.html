@@ -12,7 +12,7 @@ body{
 }
 
 .container{
-    max-width:520px;
+    max-width:700px;
     margin:auto;
     padding:20px;
 }
@@ -37,7 +37,6 @@ body{
     color:#555;
 }
 
-/* 登入區 */
 .search-box{
     display:flex;
     flex-direction:column;
@@ -70,46 +69,40 @@ button{
     cursor:pointer;
 }
 
-button:hover{
-    background:#27ae60;
-}
-
 button:disabled{
     background:#95a5a6;
-    cursor:not-allowed;
 }
-
 /* 薪資單 */
 .salary-card{
     background:white;
     border-radius:12px;
-    padding:28px;
-    margin-top:20px;
+    padding:30px;
+    margin:0 auto;
     box-shadow:0 4px 10px rgba(0,0,0,0.15);
 }
 
 .salary-title{
-    font-size:33px; /* 原30 放大10% */
+    font-size:33px;
     text-align:center;
     font-weight:bold;
     margin-bottom:15px;
 }
 
 .info{
-    font-size:22px; /* 原20 */
-    line-height:1.9;
+    font-size:22px;
+    line-height:1.8;
     margin-bottom:15px;
 }
 
 .salary-table{
     width:100%;
     border-collapse:collapse;
-    font-size:24px; /* 原22 */
+    font-size:24px;
 }
 
 .salary-table td{
     border:1px solid #ddd;
-    padding:12px;
+    padding:10px;
     word-break:break-word;
 }
 
@@ -126,17 +119,18 @@ button:disabled{
 
 .final-total{
     margin-top:20px;
-    font-size:33px; /* 原30 */
+    font-size:33px;
     font-weight:bold;
     text-align:right;
-    color:#e74c3c;
+    color:#27ae60;
 }
 
 .note{
     margin-top:20px;
-    font-size:18px; /* 原16 */
+    font-size:18px;
     color:#555;
 }
+    
 </style>
 </head>
 <body>
@@ -147,8 +141,8 @@ button:disabled{
 <div id="date-display" class="date-display"></div>
 
 <div class="search-box" id="code-box" style="display:none;">
-<input type="password" id="uid" placeholder="請輸入代碼">
-<button id="queryBtn" onclick="querySalary()">查詢薪資</button>
+    <input type="password" id="uid" placeholder="請輸入代碼">
+    <button id="queryBtn" onclick="querySalary()">查詢薪資</button>
 </div>
 
 <div id="result"></div>
@@ -334,6 +328,10 @@ function querySalary(){
                 2. 薪資如有問題請聯繫人資
             </div>
         </div>`;
+        window.scrollTo({
+    top:0,
+    behavior:"smooth"
+});
     })
     .catch(err=>{
 
