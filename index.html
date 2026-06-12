@@ -218,6 +218,12 @@ function querySalary(){
             return;
         }
 
+        // 登入成功隱藏登入畫面
+     document.getElementById("code-box").style.display="none";
+     document.querySelector(".title").style.display="none";
+     document.getElementById("greeting").style.display="none";
+     document.getElementById("date-display").style.display="none";
+        
         let header=data[0].data;
         let row=data[1].data;
 
