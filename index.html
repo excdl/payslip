@@ -1,9 +1,11 @@
-<!DOCTYPE html> 
+
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
 <title>員工薪資查詢</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
 <style>
 body{
     font-family:"微軟正黑體";
@@ -11,10 +13,47 @@ body{
     margin:0;
 }
 
+/* loading */
+.loading{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(255,255,255,0.9);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+.spinner{
+    width:60px;
+    height:60px;
+    border:6px solid #eee;
+    border-top:6px solid #2ecc71;
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+    0%{transform:rotate(0deg);}
+    100%{transform:rotate(360deg);}
+}
+
+.loading-text{
+    margin-top:15px;
+    font-size:20px;
+}
+
+/* container */
 .container{
-    max-width:640px;
+    width:100%;
+    max-width:560px;
     margin:auto;
     padding:20px;
+    box-sizing:border-box;
 }
 
 .title{
@@ -37,6 +76,7 @@ body{
     color:#555;
 }
 
+/* login */
 .search-box{
     display:flex;
     flex-direction:column;
@@ -72,20 +112,23 @@ button{
 button:disabled{
     background:#95a5a6;
 }
-/* 薪資單 */
+
+/* 薪資卡片 */
 .salary-card{
     background:white;
-    border-radius:12px;
-    padding:30px;
-    margin:0 auto;
-    box-shadow:0 4px 10px rgba(0,0,0,0.15);
+    border-radius:18px;
+    padding:28px;
+    margin:20px auto;
+    box-shadow:0 10px 25px rgba(0,0,0,0.08);
+    border:1px solid #eee;
 }
 
 .salary-title{
-    font-size:33px;
-    text-align:center;
+    font-size:34px;
     font-weight:bold;
+    text-align:center;
     margin-bottom:15px;
+    color:#2c3e50;
 }
 
 .info{
@@ -101,9 +144,8 @@ button:disabled{
 }
 
 .salary-table td{
-    border:1px solid #ddd;
-    padding:10px;
-    word-break:break-word;
+    border:1px solid #eee;
+    padding:12px;
 }
 
 .table-head{
@@ -119,10 +161,10 @@ button:disabled{
 
 .final-total{
     margin-top:20px;
-    font-size:33px;
+    font-size:34px;
     font-weight:bold;
     text-align:right;
-    color:#27ae60;
+    color:#1e8449;
 }
 
 .note{
@@ -130,25 +172,34 @@ button:disabled{
     font-size:18px;
     color:#555;
 }
-    
 </style>
 </head>
+
 <body>
 
-<div class="container">
-<div class="title">員工薪資查詢</div>
-<div id="greeting" class="greeting"></div>
-<div id="date-display" class="date-display"></div>
-
-<div class="search-box" id="code-box" style="display:none;">
-    <input type="password" id="uid" placeholder="請輸入代碼">
-    <button id="queryBtn" onclick="querySalary()">查詢薪資</button>
+<!-- loading -->
+<div id="loading" class="loading" style="display:none;">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">載入中...</div>
 </div>
 
-<div id="result"></div>
+<div class="container">
+
+    <div class="title">員工薪資查詢</div>
+    <div id="greeting" class="greeting"></div>
+    <div id="date-display" class="date-display"></div>
+
+    <div class="search-box" id="code-box" style="display:none;">
+        <input type="password" id="uid" placeholder="請輸入代碼">
+        <button id="queryBtn" onclick="querySalary()">查詢薪資</button>
+    </div>
+
+    <div id="result"></div>
+
 </div>
 
 <script>
+
 var url="https://script.google.com/macros/s/AKfycbzCGnlurATtmipIZBZepRwWzQeRTKOV5DqEdA4IjWHHGY-MT4fuQAZqUC729tLsYVD5/exec"; 
 var lineId="";
 var lineName="";
@@ -157,192 +208,128 @@ function formatDate(d){
     return d.getFullYear()+"-"+(d.getMonth()+1).toString().padStart(2,'0')+"-"+d.getDate().toString().padStart(2,'0');
 }
 
-// 初始化 LIFF
+/* LIFF */
 liff.init({liffId: "2009495087-qHY8LDuV"})
 .then(()=>{
-    if(!liff.isLoggedIn()){ liff.login(); return; }
+
+    if(!liff.isLoggedIn()){
+        lineId="test";
+        lineName="測試使用者";
+
+        document.getElementById("greeting").innerText=lineName+" 您好:";
+        document.getElementById("date-display").innerText="查詢日期: "+formatDate(new Date());
+
+        document.getElementById("code-box").style.display="flex";
+        return;
+    }
+
     return liff.getProfile();
 })
 .then(profile=>{
-    lineId = profile.userId;
-    lineName = profile.displayName;
-    document.getElementById("greeting").innerText = lineName + " 您好:";
-    document.getElementById("date-display").innerText = "查詢日期: " + formatDate(new Date());
+
+    if(profile){
+        lineId=profile.userId;
+        lineName=profile.displayName;
+
+        document.getElementById("greeting").innerText=lineName+" 您好:";
+        document.getElementById("date-display").innerText="查詢日期: "+formatDate(new Date());
+    }
 
     fetch(url+"?uid=&lineid="+encodeURIComponent(lineId))
     .then(res=>res.json())
     .then(data=>{
-        if(data.length > 1){
+        if(data.length>1){
             document.getElementById("code-box").style.display="flex";
-        } else {
-            document.getElementById("result").innerHTML="<h3 style='color:red;text-align:center'>尚未建立薪資資料，請聯繫人資</h3>";
+        }else{
+            document.getElementById("result").innerHTML="<h3 style='color:red;text-align:center'>尚未建立資料</h3>";
         }
-    })
-    .catch(err=>console.error(err));
+    });
+
 })
 .catch(err=>console.error(err));
 
-// 查詢薪資
+/* 查詢 */
 function querySalary(){
 
     let uid=document.getElementById("uid").value.trim();
-
     if(!uid){
         alert("請輸入代碼");
         return;
     }
 
     let btn=document.getElementById("queryBtn");
+    let loading=document.getElementById("loading");
 
     btn.disabled=true;
-    btn.innerText="登入中...";
+    loading.style.display="flex";
+    document.getElementById("loadingText").innerText="登入中...";
 
     fetch(url+"?uid="+encodeURIComponent(uid)+"&lineid="+encodeURIComponent(lineId))
     .then(res=>res.json())
     .then(data=>{
 
         btn.disabled=false;
-        btn.innerText="查詢薪資";
-
-        let container=document.getElementById("result");
-        container.innerHTML="";
+        loading.style.display="none";
 
         if(data.length<=1){
-            container.innerHTML="<h3 style='color:red;text-align:center'>查無資料</h3>";
+            document.getElementById("result").innerHTML="<h3 style='color:red;text-align:center'>查無資料</h3>";
             return;
         }
 
-        // 登入成功隱藏登入畫面
-     document.getElementById("code-box").style.display="none";
-     document.querySelector(".title").style.display="none";
-     document.getElementById("greeting").style.display="none";
-     document.getElementById("date-display").style.display="none";
-        
+        document.getElementById("code-box").style.display="none";
+        document.querySelector(".title").style.display="none";
+        document.getElementById("greeting").style.display="none";
+        document.getElementById("date-display").style.display="none";
+
         let header=data[0].data;
         let row=data[1].data;
 
-        function get(nameList){
-            for(let name of nameList){
-                let idx=header.indexOf(name);
-                if(idx>-1) return row[idx];
+        function get(list){
+            for(let n of list){
+                let i=header.indexOf(n);
+                if(i>-1) return row[i];
             }
             return "";
         }
 
-        function show(value){
-            return !(value=="" || value=="0" || value=="0.00");
+        function money(v){
+            if(!v) return "";
+            let n=Number(String(v).replace(/,/g,""));
+            return isNaN(n)?v:"$"+n.toLocaleString();
         }
 
-        function formatMoney(value){
-            if(value === "" || value === null || value === undefined) return "";
-
-            let num = Number(String(value).replace(/,/g, ""));
-            if (isNaN(num)) return value;
-
-            return "$" + num.toLocaleString("zh-TW");
-        }
-
-        function moneyRow(name,value){
-            if(!show(value)) return "";
-            return `<tr><td>${name}</td><td>${formatMoney(value)}</td></tr>`;
-        }
-
-        function textRow(name,value){
-
-            if(!value || value.trim()=="") return "";
-
-            let html=value
-                .split(/\r?\n/)
-                .filter(x=>x.trim()!=="")
-                .map(x=>`• ${x}`)
-                .join("<br>");
-
-            return `
-            <tr>
-                <td>${name}</td>
-                <td style="text-align:left;line-height:1.8;">
-                    ${html}
-                </td>
-            </tr>`;
-        }
-
-        let addHTML="";
-        addHTML += moneyRow("加項薪資",get(["加項薪資"]));
-        addHTML += textRow("加項薪資說明",get(["加項薪資說明"]));
-        addHTML += moneyRow("其他加項",get(["其他加項"]));
-        addHTML += textRow("其他加項說明",get(["其他加項說明"]));
-        addHTML += moneyRow("新增加項",get(["新增加項"]));
-        addHTML += textRow("加項說明",get(["加項說明"]));
-
-        let minusHTML="";
-        minusHTML += moneyRow("勞保費",get(["勞保費"]));
-        minusHTML += moneyRow("健保費",get(["健保費"]));
-        minusHTML += moneyRow("事假扣款",get(["事假扣款"]));
-        minusHTML += moneyRow("病假扣款",get(["病假扣款"]));
-        minusHTML += moneyRow("其他減項",get(["其他減項"]));
-        addHTML += textRow("其他減項說明",get(["其他減項說明"]));
-        minusHTML += moneyRow("新增減項",get(["新增減項"]));
-        addHTML += textRow("減項說明",get(["減項說明"]));
-
-        container.innerHTML=`
-        <div id="salary-card" class="salary-card">
-            <div class="salary-title">薪資明細表</div>
+        let html=`
+        <div class="salary-card">
+            <div class="salary-title">💰 薪資明細表</div>
 
             <div class="info">
                 姓名：${get(["員工姓名"])}<br>
-                計薪月份：${get(["薪資結算月份"])}<br>
-                應發薪資：${formatMoney(get(["應發薪資"]))}
+                月份：${get(["薪資結算月份"])}<br>
+                應發：${money(get(["應發薪資"]))}
             </div>
 
-            <table class="salary-table">
-                <tr class="table-head">
-                    <td>項目(+)</td>
-                    <td>金額</td>
-                </tr>
-                ${addHTML}
-                <tr class="subtotal">
-                    <td>加項總額</td>
-                    <td>${formatMoney(get(["加項總額"]))}</td>
-                </tr>
-            </table>
-
-            <table class="salary-table" style="margin-top:10px;">
-                <tr class="table-head">
-                    <td>項目(-)</td>
-                    <td>金額</td>
-                </tr>
-                ${minusHTML}
-                <tr class="subtotal">
-                    <td>減項總額</td>
-                    <td>${formatMoney(get(["減項總額"]))}</td>
-                </tr>
-            </table>
-
             <div class="final-total">
-                實發金額：${formatMoney(get(["實發金額"]))}
+                實發：${money(get(["實發金額"]))}
             </div>
 
             <div class="note">
-                備註事項<br>
-                1. 每月7號為薪資發放日<br>
-                2. 薪資如有問題請聯繫人資
+                1. 每月7號發薪<br>
+                2. 請洽人資
             </div>
         </div>`;
-        window.scrollTo({
-    top:0,
-    behavior:"smooth"
-});
+
+        document.getElementById("result").innerHTML=html;
+
+        window.scrollTo({top:0,behavior:"smooth"});
     })
     .catch(err=>{
-
         console.error(err);
-
+        loading.style.display="none";
         btn.disabled=false;
-        btn.innerText="查詢薪資";
-
-        alert("系統連線失敗，請稍後再試");
+        alert("系統錯誤");
     });
 }
+
 </script>
 
 </body>
